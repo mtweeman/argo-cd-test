@@ -1,0 +1,46 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: appset
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - matrix:
+        generators:
+          - list:
+              elements:
+                - cluster: dev
+                  url: https://host.docker.internal:37379
+                - cluster: qa
+                  url: https://host.docker.internal:42777
+          - git:
+              repoURL: https://github.com/mtweeman/argo-cd-test.git
+              revision: HEAD
+              directories:
+                - path: apps/*
+  template:
+    metadata:
+      name: '{{index .path.segments 1}}-{{.cluster}}'
+    spec:
+      project: default
+      sources:
+        - repoURL: https://github.com/mtweeman/argo-cd-test.git
+          path: '{{.path.path}}'
+          targetRevision: HEAD
+          helm:
+            valueFiles:
+              - $values/values/envs/{{.cluster}}-values.yaml
+        - repoURL: https://github.com/mtweeman/argo-cd-test.git
+          targetRevision: HEAD
+          ref: values
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: default
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+        automated:
+          selfHeal: true
+          prune: true
