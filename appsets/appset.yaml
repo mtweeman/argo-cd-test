@@ -27,11 +27,11 @@ spec:
       project: default
       sources:
         - repoURL: https://github.com/mtweeman/argo-cd-test.git
-          path: '{{.path.path}}'
+          path: '{{.path.path}}/envs/{{index .metadata.labels "env"}}'
           targetRevision: HEAD
           helm:
             valueFiles:
-              - $values/values/envs/{{index .metadata.labels "env"}}-values.yaml
+              - $values/values/{{index .path.segments 1}}/envs/{{index .metadata.labels "env"}}-values.yaml
         - repoURL: https://github.com/mtweeman/argo-cd-test.git
           targetRevision: HEAD
           ref: values
