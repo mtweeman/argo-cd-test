@@ -11,8 +11,10 @@ spec:
         generators:
           - clusters:
               selector:
-                matchLabels:
-                  env: dev
+                matchExpressions:
+                  - key: env
+                    operator: In
+                    values: ["dev", "qa"]
           - git:
               repoURL: https://github.com/mtweeman/argo-cd-test.git
               revision: HEAD
