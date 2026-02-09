@@ -9,12 +9,10 @@ spec:
   generators:
     - matrix:
         generators:
-          - list:
-              elements:
-                - cluster: dev
-                  url: https://host.docker.internal:37379
-                - cluster: qa
-                  url: https://host.docker.internal:42777
+          - clusters:
+              selector:
+                matchLabels:
+                  env: dev
           - git:
               repoURL: https://github.com/mtweeman/argo-cd-test.git
               revision: HEAD
@@ -22,7 +20,7 @@ spec:
                 - path: apps/*
   template:
     metadata:
-      name: '{{index .path.segments 1}}-{{.cluster}}'
+      name: '{{index .path.segments 1}}'
     spec:
       project: default
       sources:
@@ -31,7 +29,7 @@ spec:
           targetRevision: HEAD
           helm:
             valueFiles:
-              - $values/values/envs/{{.cluster}}-values.yaml
+              - $values/values/envs/{{index .metadata.labels "env"}}-values.yaml
         - repoURL: https://github.com/mtweeman/argo-cd-test.git
           targetRevision: HEAD
           ref: values
