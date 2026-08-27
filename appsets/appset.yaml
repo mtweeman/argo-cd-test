@@ -3,6 +3,8 @@ kind: ApplicationSet
 metadata:
   name: appset
   namespace: argocd
+#  finalizers:
+#    - resources-finalizer.argocd.argoproj.io
 spec:
   goTemplate: true
   goTemplateOptions: ["missingkey=error"]
@@ -20,9 +22,13 @@ spec:
               revision: HEAD
               directories:
                 - path: apps/*
+  syncPolicy:
+    preserveResourcesOnDeletion: true
   template:
     metadata:
       name: '{{index .path.segments 1}}'
+#      finalizers:
+#        - resources-finalizer.argocd.argoproj.io
     spec:
       project: default
       sources:
