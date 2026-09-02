@@ -24,11 +24,14 @@ spec:
                 - path: apps/*
   syncPolicy:
     preserveResourcesOnDeletion: true
+  ignoreApplicationDifferences:
+    - jsonPointers:
+        - /spec/syncPolicy/automated
+#    - jqPathExpressions:
+#        - .spec.sources[].targetRevision
   template:
     metadata:
       name: '{{index .path.segments 1}}'
-#      finalizers:
-#        - resources-finalizer.argocd.argoproj.io
     spec:
       project: default
       sources:
